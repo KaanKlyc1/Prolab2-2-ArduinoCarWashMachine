@@ -1,0 +1,312 @@
+#include<EEPROM.h>
+
+int bitis=0;
+int toplampara=0;
+int odenecek=0;
+int rastgele;
+
+int a=20;//ilk banknot sayilari
+int b=20;
+int c=10;
+int d=30;
+int e=5;
+int f=30;//ilk hizmet sayilari
+int g=50;
+int h=100;
+int i=20;
+int tempKop=0;//hizmetlere basilma sayisi
+int tempYi=0;
+int tempKu=0;
+int tempCi=0;
+int temp5=0;//yuklemeye basilma sayisi
+int temp10=0;
+int temp20=0;
+int temp50=0;
+int temp100=0;
+
+void setup()
+{
+  Serial.begin(9600);
+  pinMode(2, INPUT);
+  pinMode(3, INPUT);
+  pinMode(4, INPUT);
+  pinMode(5, INPUT);
+  pinMode(6, INPUT);
+  pinMode(7, INPUT);
+  pinMode(8, INPUT);
+  pinMode(12, OUTPUT);
+  pinMode(13, OUTPUT);
+  
+  EEPROM.write(0,a);//5 TLlik banknot sayisi
+  EEPROM.write(1,b);//10 TLlik banknot sayisi
+  EEPROM.write(2,c);//20 TLlik banknot sayisi
+  EEPROM.write(3,d);//50 TLlik banknot sayisi
+  EEPROM.write(4,e);//100 TLlik banknot sayisi
+  
+  EEPROM.write(5,f);//Kalan kopukleme sayisi
+  EEPROM.write(6,g);//Kalan yıkama sayisi
+  EEPROM.write(7,h);//Kalan kurulama sayisi
+  EEPROM.write(8,i);//Kalan cilalama sayisi
+  
+  
+}
+
+void loop()
+{
+  if(digitalRead(2)== HIGH){
+  delay(200);
+  bitis=0;
+  toplampara=0;
+  odenecek=0;
+  a=a-temp5;
+  b=b-temp10;
+  c=c-temp20;
+  d=d-temp50;
+  e=e-temp100;
+  EEPROM.write(0,a);  
+  EEPROM.write(1,b);
+  EEPROM.write(2,c);
+  EEPROM.write(3,d);
+  EEPROM.write(4,e);
+  f=f+tempKop;
+  g=g+tempYi;
+  h=h+tempKu;
+  i=i+tempCi;
+  EEPROM.write(5,f); 
+  EEPROM.write(6,g);
+  EEPROM.write(7,h);
+  EEPROM.write(8,i);
+  
+  temp5=0;
+  temp10=0;
+  temp20=0;
+  temp50=0;
+  temp100=0;
+  tempKop=0;
+  tempYi=0;
+  tempKu=0;
+  tempCi=0;
+  digitalWrite(12,LOW);
+  digitalWrite(13,LOW);
+  
+  Serial.println("Secimler resetlendi.");
+  Serial.println("");
+  }
+  
+  
+  
+  if(bitis==0){//Para yukleme
+   
+  if(digitalRead(3)== HIGH){
+  delay(200);
+  toplampara+=5;
+  a++;
+  temp5++;
+  EEPROM.write(0,a);
+  Serial.println("5 TL yuklendi.");
+  }
+  
+  if(digitalRead(4)== HIGH){
+  delay(200);
+  toplampara+=10;
+  b++;
+  temp10++;
+  EEPROM.write(1,b);
+  Serial.println("10 TL yuklendi.");
+  }
+  
+  if(digitalRead(5)== HIGH){
+  delay(200);
+  toplampara+=20;
+  c++;
+  temp20++;
+  EEPROM.write(2,c);
+  Serial.println("20 TL yuklendi.");
+  }
+  
+  if(digitalRead(6)== HIGH){
+  delay(200);
+  toplampara+=50;
+  d++;
+  temp50++;
+  EEPROM.write(3,d);
+  Serial.println("50 TL yuklendi.");
+  }
+    
+  if(digitalRead(7)== HIGH){
+  delay(200);
+  toplampara+=100;
+  e++;
+  temp100++;
+  EEPROM.write(4,e);
+  Serial.println("100 TL yuklendi.");
+  }
+  
+  if(digitalRead(8)== HIGH){
+  delay(200);
+  Serial.print("Yuklenen tutar: ");
+  Serial.println(toplampara);
+  Serial.println("Hizmet seciniz.");
+  Serial.println("");
+  bitis++;
+  }  
+    
+  }//Para yukleme
+  
+  if(bitis==1){//Hizmet secimi
+    
+  if(digitalRead(3)== HIGH){
+  delay(200);
+  odenecek+=15;
+  f--;
+  tempKop++;
+  Serial.println("Kopukleme: 15 TL");
+  EEPROM.write(5,f);
+  }
+  
+  if(digitalRead(4)== HIGH){
+  delay(200);
+  odenecek+=10;
+  tempYi++;
+  g--;
+  Serial.println("Yikama: 10 TL");
+  EEPROM.write(6,g);
+  }
+  
+  if(digitalRead(5)== HIGH){
+  delay(200);
+  odenecek+=5;
+  tempKu++;
+  h--;
+  Serial.println("Kurulama: 5 TL");
+  EEPROM.write(7,h);
+  }
+  
+  if(digitalRead(6)== HIGH){
+  delay(200);
+  odenecek+=50;
+  tempCi++;
+  i--;
+  Serial.println("Cilalama: 50 TL");
+  EEPROM.write(8,i);
+  }
+    
+  if(digitalRead(8)== HIGH){
+  delay(200);
+  Serial.println("Hizmetler secildi.");
+  Serial.println("");
+  Serial.print("Yuklenen para: ");
+  Serial.println(toplampara);
+  Serial.print("Odenecek tutar: ");
+  Serial.println(odenecek);
+  rastgele= random(1,5);
+  
+  if(rastgele==2){
+  Serial.println("Para sikisti. Lutfen reset tusuna basiniz.");
+  Serial.println("");
+  
+  digitalWrite(13,LOW);
+  digitalWrite(12,HIGH);
+  }
+    
+  else{
+  if((toplampara-odenecek)>=0){
+  digitalWrite(13,HIGH);
+  digitalWrite(12,LOW);
+  tempKop=0;
+  tempYi=0;
+  tempKu=0;
+  tempCi=0;
+  temp5=0;
+  temp10=0;
+  temp20=0;
+  temp50=0;
+  temp100=0;
+  int paraustu=toplampara-odenecek;
+    
+  Serial.print("Para ustu: ");
+  Serial.print(paraustu);
+  Serial.print(" TL");
+  Serial.println("");
+ 
+  if(paraustu!=0){
+
+   int yuzluk=0;
+   int ellilik=0;
+   int yirmilik=0;
+   int onluk=0;
+   int beslik=0;
+
+   yuzluk=paraustu/100;
+   e=e-yuzluk;
+   EEPROM.write(4,e);
+   paraustu = paraustu-(yuzluk*100);
+   ellilik=paraustu/50;
+   d=d-ellilik;
+   EEPROM.write(3,d);
+   paraustu = paraustu -(ellilik*50);
+   yirmilik=paraustu/20;
+   c=c-yirmilik;
+   EEPROM.write(2,c);
+   paraustu = paraustu -(yirmilik*20);
+   onluk=paraustu/10;
+   b=b-onluk;
+   EEPROM.write(1,b); 
+   paraustu = paraustu -(onluk*10);
+   beslik=paraustu/5;
+   a=a-beslik;
+   EEPROM.write(0,a); 
+   paraustu = paraustu -(beslik*5);
+   Serial.println("Verilecek para: ");
+   Serial.print(yuzluk);
+   Serial.println(" tane 100 TL");
+   Serial.print(ellilik);
+   Serial.println(" tane 50 TL");
+   Serial.print(yirmilik);
+   Serial.println(" tane 20 TL");
+   Serial.print(onluk);
+   Serial.println(" tane 10 TL");
+   Serial.print(beslik);
+   Serial.println(" tane 5 TL");
+   }
+  Serial.println("");
+    
+  Serial.println("Kasadaki banknot sayisi: "); 
+  Serial.print("5 TL sayisi: ");
+  Serial.println(EEPROM.read(0));
+  Serial.print("10 TL sayisi: ");
+  Serial.println(EEPROM.read(1));
+  Serial.print("20 TL sayisi: ");
+  Serial.println(EEPROM.read(2));
+  Serial.print("50 TL sayisi: ");
+  Serial.println(EEPROM.read(3));
+  Serial.print("100 TL sayisi: ");
+  Serial.println(EEPROM.read(4));
+  Serial.println(""); 
+  Serial.println("Kalan hizmet sayilari: ");
+  Serial.println("");
+  Serial.print("Kopukleme sayisi: ");
+  Serial.println(EEPROM.read(5));
+  Serial.print("Yikama sayisi: ");
+  Serial.println(EEPROM.read(6));
+  Serial.print("Kurulama sayisi: ");
+  Serial.println(EEPROM.read(7));
+  Serial.print("Cilalama sayisi: ");
+  Serial.println(EEPROM.read(8));
+  
+  Serial.println("");
+  Serial.println("");
+  Serial.println("Lutfen reset tusuna basiniz.");
+  }
+  
+  else{
+  Serial.println("Kasada yeterli para yoktur.");
+  }  
+       
+  }  
+    
+  }  
+    
+  }//Hizmet secimi
+    
+}

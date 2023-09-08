@@ -1,0 +1,7 @@
+http://embedded.kocaeli.edu.tr/?page_id=93
+https://electronoobs.com/eng_tutoriales_arduino.php
+https://www.arduino.cc/en/Reference/EEPROM
+https://www.arduino.cc/reference/en/language/functions/communication/serial/
+https://www.youtube.com/watch?v=oAbflsG2ZGQ
+https://www.youtube.com/watch?v=VFP69YFgRzA
+https://www.youtube.com/watch?v=dacGB-GODaY
